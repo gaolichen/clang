@@ -4,7 +4,7 @@
 #include <stdio.h>
 
 // problem 1: input a year, print yes if it is a leap year, print no otherwise.
-void isLeapYear() {
+void problem1() {
 	int year;
 	scanf("%d", &year);
 	if (year % 400 == 0 || (year % 100 != 0 && year % 4 == 0)) {
@@ -16,5 +16,5 @@ void isLeapYear() {
 }
 
 int main() {
-	isLeapYear();
+	problem1();
 }
