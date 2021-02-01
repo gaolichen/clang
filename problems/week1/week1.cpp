@@ -158,7 +158,94 @@ void problem9() {
 	printf("%d\n", b);
 }
 
+// 输入一个月几天 1号是星期几，输入这个月的日历格式
+void problem10() {
+	int day, daysOfMonth, i;
+	// 输入一个月有几天 和 1号是星期几
+	scanf("%d %d", &daysOfMonth, &day);
+	
+	for (i = 0; i < day; i++) {
+		printf("   ");
+	}
+
+	for (i = 1; i <= daysOfMonth; i++) {
+		if (day % 7 == 6) {
+			printf("%2d\n", i);
+		}
+		else {
+			printf("%2d ", i);
+		}
+		day++;
+	}
+}
+
+// 输出小于等于n的所有质数
+void problem11() {
+	int n, i, j;
+	scanf("%d", &n);
+
+	for (i = 2; i <= n; i++) {
+		// 判断i是否是质数
+		for (j = 2; j * j <= i; j++) {
+			if (i % j == 0) {
+				break;
+			}
+		}
+
+		if (j * j > i) {
+			// i是质数
+			printf("%d ", i);
+		}
+		else {
+			// i 不是质数
+		}
+	}
+	printf("\n");
+}
+
+// 输入n 计算自然对数的底数e=1 + 1/1! + 1/2! + 1/3! + ... + 1/n!
+// n! 表示n的阶乘
+
+// 1/3! 是 1/2! 的 1/3 
+
+void problem12() {
+	int n, i;
+	double res = 1.0, inc = 1.0;
+	scanf("%d", &n);
+	for (i = 1; i <= n; i++) {
+		inc /= i;
+		res += inc;
+	}
+
+	// 第一步 i=1
+	// inc /= i:  inc /=1; inc = 1.0
+	// res += 1.0; res = 2.0;
+	// 第二b步 i = 2
+	// inc /= i: inc /= 2; => inc = 1/2 = 1/2;
+	// res += inc: res += 0.5; => res = 2.5;
+	// 第三步
+	// inc/=i: inc/=3; ==> inc = 1/2/3 =1/6
+	// res += inc: res = 2.5 + 1/6 = 2.61666667
+
+	printf("%0.15lf\n", res);
+}
+
+// 输入n， 输入n的奇数位和偶数位的数
+void problem13() {
+	int n, even, odd, ten;
+	scanf("%d", &n);
+	for (ten = 1, even = odd = 0; n > 0; n /=10, ten *= 10) {
+		odd += (n % 10) * ten;
+		n /= 10;
+		even += (n % 10) * ten;
+//		ten *= 10;
+//		n /= 10;
+	}
+
+	printf("%d %d\n", odd, even);
+}
+
 int main() {
-	problem9();
+	problem13();
 	return 0;
 }
