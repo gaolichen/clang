@@ -280,7 +280,137 @@ void problem9() {
     }
 }
 
+#define MAX_R 100
+#define MAX_C 100
+
+void problem10() {
+    int r, c, i, j, a;
+    int sum_r[MAX_R] = { 0 }, sum_c[MAX_C] = { 0 };
+/*  // 用二维数组  
+    int arr[MAX_R][MAX_C];
+    scanf("%d %d", &r, &c);
+    for (i = 0; i < r; i++) {
+        for (j = 0; j < c; j++) {
+            scanf("%d", &arr[i][j]);
+            sum_r[i] += arr[i][j];
+            sum_c[j] += arr[i][j];
+        }
+    }*/
+
+    // 不需要二维数组
+    scanf("%d %d", &r, &c);
+    for (i = 0; i < r; i++) {
+        for (j = 0; j < c; j++) {
+            scanf("%d", &a);
+            sum_r[i] += a;
+            sum_c[j] += a;
+        }
+    }
+
+    printf("每行的数字和是: ");
+    for (i = 0; i < r; i++) {
+        printf("%d ", sum_r[i]);
+    }
+    printf("\n");
+
+    printf("每行的平均数是: ");
+    for (i = 0; i < r; i++) {
+        printf("%.2f ", (double)sum_r[i] / c);
+    }
+    printf("\n");
+
+    printf("每列的数字和是: ");
+    for (i = 0; i < c; i++) {
+        printf("%d ", sum_c[i]);
+    }
+    printf("\n");
+
+    printf("每行的平均数是: ");
+    for (i = 0; i < c; i++) {
+        printf("%.2f ", (double)sum_c[i] / c);
+    }
+    printf("\n");
+}
+
+void problem11() {
+    char ch, input[100] = {0};
+    int count[10] = { 0 }, n = 0, i;
+    // count[0,...,9]
+    // count[0] 存储 '0' 出现的次数
+    // count[1] 存储 '1' 出现的次数
+    // ...
+    // count[9] 存储 '9' 出现的次数
+
+    while ((ch = getchar()) != '\n') {
+        input[n++] = ch;
+    }
+
+    // n = 多少个字符
+    // 统计 各个字符出现的频率
+    // input[i]: 字符'0'到'9'
+    // input[i] - '0': 整数0到9
+    for (i = 0; i < n; i++) {
+        count[input[i] - '0']++;
+    }
+
+    for (i = 0; i <= 9; i++) {
+        if (count[i] != 0) {
+            printf("%d %d\n", i, count[i]);
+        }
+    }
+}
+
+void problem12() {
+    int n, m = 0, i;
+    char input[100];
+    scanf("%d", &n);
+
+    // 输入一行
+    getchar();
+    while ((input[m] = getchar()) != '\n') {
+        m++;
+    }
+
+/*    // m++: 先使用m 后++
+    // ++m: 先++ 后使用m
+    while ((input[m] = getchar()) != '\n') {
+        m++;
+    }
+
+    while ((ch = getchar()) != '\n') {
+        input[m++] = ch;
+    }*/
+
+    // 加密
+    for (i = 0; i < m; i++) {
+        if ('a' <= input[i] && input[i] <= 'z') {
+            input[i] += n; // 有可能溢出
+            if (input[i] > 'z') {
+//                input[i] -= 26;
+                // if input[i] == 'c',
+                //    input[i] = 'a' + ('c' - 'a') % 26 == 'a' + 2 % 26 == 'a' + 2 == 'c'
+                // if input[i] == 'z' + 2
+                //    input[i] = 'a' + ('z' + 2 - 'a') % 26 == 'a' + 28 % 26 == 'a' + 2 == 'c'
+                input[i] = 'a' + (input[i] - 'a') % 26;
+            }
+        }
+
+        if ('A' <= input[i] && input[i] <= 'Z') {
+            input[i] = 'A' + (input[i] - 'A' + n) % 26; // 没有溢出问题
+            /*input[i] = input[i] + n % 26;
+            if (input[i] > 'Z') {
+                input[i] -= 26;
+            }*/
+        }
+    }
+
+    for (i = 0; i < m; i++) {
+        printf("%c", input[i]);
+    }
+    printf("\n");
+}
+
 int main()
 {
-    problem9();
+    problem12();
 }
