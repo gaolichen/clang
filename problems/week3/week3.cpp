@@ -93,14 +93,14 @@ int sum(int x, int y);
 
 int main()
 {
-	int a[10];
+/*	int a[10];
 	int b[20][10];
 	printf("%d\n", fraction(5));
 	printf("%d\n", sum(b, 20));
 
 	printf("%d\n", sum(a, 10));
-	printf("%d\n", sum(3, 4));
-//	problem1();
+	printf("%d\n", sum(3, 4));*/
+	test();
 }
 
 // 定义函数 实现函数
