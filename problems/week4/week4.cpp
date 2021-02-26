@@ -3,7 +3,6 @@
 #pragma warning(disable : 4996)
 #include <stdio.h>
 
-
 void test() {
 	int a[10] = {};
 	int b[4][3] = { 1, 2, 3, 4, 5, 6, 7, 8, 9 };
@@ -137,7 +136,105 @@ void problem7() {
 	}
 }
 
+// compute 1 + 2 + ... + n;
+// (1 + 2 + ... + (n-1)) + n
+int total(int n) {
+	// 边界判断
+	if (n <= 0) {
+		return 0;
+	}
+
+	return n + total(n - 1);
+}
+
+// if n = 3
+// return 3 + total(2);
+//            : 2 + total(1);
+//                  1 + total(0);
+//                       0;
+
+void problem8() {
+	int n;
+	scanf("%d", &n);
+	printf("%d\n", total(n));
+}
+
+// 求最大公约数
+int gcd(int a, int b) {
+	if (b == 0) {
+		return a;
+	}
+	else {
+		return gcd(b, a % b);
+	}
+}
+
+// 5 0 -> 5
+// 0 5 -> gcd(5, 0) -> 5
+// 6 3 -> gcd(3, 6%3) == gcd(3, 0) -> 3
+// 8 12 -> gcd(12, 8%12) == gcd(12, 8) -> gcd(8, 12%8)==gcd(8, 4) -> gcd(4, 8%4) == gcd(4, 0) -> 4  
+// 辗转相除法
+
+void problem9() {
+	int a, b;
+	scanf("%d %d", &a, &b);
+	printf("%d\n", gcd(a, b));
+}
+
+int size; // 当前栈里的元素个数
+char stack[80]; // 栈
+
+void push(char ch) { // 元素放到栈里
+	stack[size] = ch;
+	size++;
+}
+
+char pop() { // 把栈里的元素取出来， 返回栈里最后一个放进去的元素
+	size--;
+	return stack[size];
+}
+
+int isEmpty() { // 判断栈是否空
+	return size == 0;
+}
+
+// 判断输入括号是否匹配
+void problem10() {
+	char ch, ch2;
+	// 输入一行
+	int match = 1;
+	while ((ch = getchar()) != '\n') {
+		if (ch == '(' || ch == '{') {
+			push(ch); // 存起来
+		}
+		else if (ch == ')' || ch == '}') {
+			// 如果栈是空，不匹配，停止
+			if (isEmpty()) {
+				// 不匹配
+				match = 0;
+				break;
+			}
+
+			// 取出栈里最后一个放进去的元素
+			ch2 = pop();
+			if (ch == ')' && ch2 != '(' || ch == '}' && ch2 != '{') {
+				// 不匹配
+				match = 0;
+				break;
+			}
+		}
+	}
+	// 输出
+	if (match) { // 非0的数都是真
+		printf("yes\n");
+	}
+	else {
+		printf("no\n");
+	}
+}
+
+
 int main()
 {
-	problem7();
+	problem10();
 }
