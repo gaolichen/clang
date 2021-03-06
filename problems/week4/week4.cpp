@@ -2,6 +2,7 @@
 //
 #pragma warning(disable : 4996)
 #include <stdio.h>
+#include <math.h>
 
 void test() {
 	int a[10] = {};
@@ -231,6 +232,13 @@ void problem10() {
 	else {
 		printf("no\n");
 	}
+}
+
+void testSqrt() {
+	double i = 1.0;
+	float j = 2.0;
+	int k = sqrt(j);
+	printf("%f", sqrt(8));
 }
 
 

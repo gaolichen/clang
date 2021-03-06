@@ -48,11 +48,38 @@ void problem2() {
 	printf("%d %d\n", max, min);
 }
 
+// 用指针计算数组元素的和
 void problem3() {
-	;
+	int n, i, a[10], sum = 0, *p = &a[0];
+	
+	scanf("%d", &n);
+	for (i = 0; i < n; i++) {
+		scanf("%d", &a[i]);
+	}
+
+	while (p < &a[n]) {
+		sum += *(p++);
+	}
+
+	printf("%d\n", sum);
+}
+
+// 数组一组数字，倒序输出数组元素（用指针写）
+void problem4() {
+	int n, i, a[10], *p;
+
+	scanf("%d", &n);
+	for (i = 0; i < n; i++) {
+		scanf("%d", &a[i]);
+	}
+	p = a + n - 1;
+	while (p >= a) {
+		printf("%d ", *p--);
+	}
+	printf("\n");
 }
 
 int main()
 {
-	problem2();
+	problem4();
 }
