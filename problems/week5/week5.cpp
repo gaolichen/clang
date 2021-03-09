@@ -2,6 +2,7 @@
 //
 #pragma warning(disable : 4996)
 #include <stdio.h>
+#include <string.h>
 
 void intAndFraction(float f, int* n, float* d) {
 	*n = (int)f;
@@ -79,7 +80,67 @@ void problem4() {
 	printf("\n");
 }
 
+
+#define STR_LEN 20
+
+int read_line(char str[], int len);
+
+void problem5() {
+	char input[STR_LEN + 1];
+	read_line(input, STR_LEN);
+	printf("%s", input);
+}
+
+// 输入一行字符串，存到str里，返回字符串的长度
+int read_line(char str[], int len) {
+	char ch;
+	int i = 0;
+	while ((ch = getchar()) != '\n' && i < len) {
+		str[i++] = ch;
+	}
+	str[i] = '\0';
+	return i;
+}
+
+// 统计字符串里的隔空个数
+int count_spaces(char* str);
+
+void problem6() {
+	char str[STR_LEN + 1];
+	read_line(str, STR_LEN);
+	printf("there are %d spaces.\n", count_spaces(str));
+}
+
+int count_spaces(char* str) {
+	int count = 0;
+	while (*str) {
+		if (*str++ == ' ') {
+			count++;
+		}
+	}
+	return count;
+}
+
+char* my_strcat(char* str1, char* str2);
+
+void problem7() {
+	char str1[STR_LEN + 1], str2[STR_LEN + 1];
+	scanf("%s%s", str1, str2);
+	printf("%s\n", my_strcat(str1, str2));
+}
+
+char* my_strcat(char* str1, char* str2) {
+/*	char* p = str1;
+	// if str1="abc"; *p = 'a';
+	// 找到str1的'\0'的位置
+	while (*p) p++;*/
+//	char* p = str1 + strlen(str1);
+	// *p = '\0';
+	strcpy(str1 + strlen(str1), str2);
+	return str1;
+}
+
 int main()
 {
-	problem4();
+	problem7();
 }
