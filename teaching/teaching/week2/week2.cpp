@@ -47,7 +47,6 @@ ExpressionNode* createOpNode(char ch) {
 	return newNode;
 }
 
-
 #pragma region Link List
 
 // a Link list
@@ -89,7 +88,22 @@ struct ExpressionList {
 	}
 
 	ExpressionNode* remove(int value) {
-		// TODO
+		ExpressionNode* curr = head;
+		ExpressionNode* prev = NULL;
+		while (curr) {
+			if (curr->value == value) {
+				if (prev) {
+					prev->next = curr->next;
+				}
+				else {
+					head = curr->next;
+				}
+				return curr;
+			}
+			prev = curr;
+			curr = curr->next;
+		}
+
 		return NULL;
 	}
 

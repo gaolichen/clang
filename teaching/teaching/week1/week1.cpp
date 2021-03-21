@@ -139,7 +139,91 @@ void problem5() {
 	printf("There are %d solutions.\n", numberOfSolutions);
 }
 
+
+#define MAX_PARTS 20
+
+void partitionIntergerNoDup(int* parts, int len, int n) {
+	if (n == 0) {
+		// print;
+		for (int i = 0; i < len; i++) {
+			printf("%d ", parts[i]);
+		}
+		printf("\n");
+		return;
+	}
+
+	int i;
+	if (len == 0) {
+		i = n - 1;
+	}
+	else {
+		i = n < parts[len - 1] ? n : parts[len - 1] - 1;
+	}
+	if (i == 0) {
+		return;
+	}
+
+	for (; i > 0; i--) {
+		parts[len] = i;
+		partitionIntergerNoDup(parts, len + 1, n - i);
+	}
+}
+
+void partitionInterger(int* parts, int len, int n) {
+	if (n == 0) {
+		// print;
+		for (int i = 0; i < len; i++) {
+			printf("%d ", parts[i]);
+		}
+		printf("\n");
+		return;
+	}
+
+	int i;
+	if (len == 0) {
+		i = n - 1;
+	}
+	else {
+		i = n <= parts[len - 1] ? n : parts[len - 1];
+	}
+
+	for (; i > 0; i--) {
+		parts[len] = i;
+		partitionInterger(parts, len + 1, n - i);
+	}
+}
+
+// n = sum_i {k_i * k}
+// 7 = 3 + 3 + 1 == 0 * 6 + 0 * 5 + 0 * 4 + 2 * 3 + 0 *2 + 1 * 1
+void partitionInteger2(int* times, int k, int n) {
+	if (n == 0) {
+		// print;
+		for (int i = k - 1; i >= 1; i--) {
+			for (int j = 0; j < times[i]; j++) {
+				printf("%d ", i);
+			}
+		}
+		printf("\n");
+		return;
+	}
+	if (k > n) {
+		return;
+	}
+	for (int i = 0; i * k <= n; i++) {
+		times[k] = i;
+		partitionInteger2(times, k + 1, n - i * k);
+	}
+}
+
+void problem6() {
+	int n, parts[MAX_PARTS] = { 0 };
+	scanf("%d", &n);
+//	partitionIntergerNoDup(parts, 0, n);
+	partitionInteger2(parts, 1, n);
+}
+
+
 int main()
 {
-	problem5();
+	problem6();
 }
