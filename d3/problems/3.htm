@@ -1,0 +1,292 @@
+﻿<!DOCTYPE html>
+<html>
+    <head>
+       <meta charset="utf-8">
+       <script src="https://d3js.org/d3.v4.min.js"></script>
+       <script src="https://d3js.org/d3-scale-chromatic.v0.3.min.js"></script>
+       <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+        <style>
+        .links line {
+          stroke: #999;
+          stroke-opacity: 0.6;
+        }
+        
+        .nodes circle {
+          stroke: #fff;
+          stroke-width: 1.5px;
+        }
+        
+        </style> 
+    </head>
+<body>
+    <div id="svgContainer"></div>
+
+<script language = "javascript">
+//var jasonPath = "https://raw.githubusercontent.com/HKUST-VISLab/coding-challenge/master/HKUST_coauthor_graph.json";
+var jasonPath = "data/HKUST_coauthor_graph.json";
+
+var linkViewHeight = 600;
+var linkViewWidth = 400;
+
+var matrixHeight = 500;
+var matrixWidth = 500;
+var legendWidth = 120;
+var matrixTitleHeight = 0;
+
+var matOffsetX = 150;
+var matOffsetY = 150;
+var cellMarginRatio = 0.1;
+
+var arrowWidth = 200;
+var fontSize = 8;
+
+var graph = {"nodes":[], "edges":[]};
+var edgeMap;
+
+var svg = d3.select("#svgContainer")
+        .append("svg")
+        .attr("width", linkViewWidth)
+        .attr("height", linkViewHeight);
+
+var group = d3.select("#svgContainer")
+                .append("g")
+                .attr("transform", "translate(" + (linkViewWidth + arrowWidth) + ", 0)");
+
+var svgMat = group.append("svg")
+            .attr("width", matrixWidth + matOffsetX + legendWidth)
+            .attr("height", matrixHeight + matOffsetY);
+
+var color = d3.scaleOrdinal(d3.schemeCategory20);
+
+var cellColorDark = d3.scaleThreshold()
+        .domain(d3.range(5, 35, 5))
+        .range(d3.range(7).map((i) => d3.schemeSet2[i]));
+        
+var simulation = d3.forceSimulation()
+    .force("link", d3.forceLink().id(function(d) { return d.id; }))
+    .force("charge", d3.forceManyBody())
+    .force("center", d3.forceCenter(linkViewWidth / 2, linkViewHeight / 2));
+
+d3.json(jasonPath, function(error, graphAll) {
+  if (error) throw error;
+
+  var ids = d3.set();
+  for (let i = 0; i < graphAll.nodes.length; i++) {
+      if (graphAll.nodes[i].dept == "CSE" && graphAll.nodes[i].fullname != "") {
+          graph.nodes.push(graphAll.nodes[i]);
+          ids.add(graphAll.nodes[i].id);
+      }
+  }
+  
+  graph.nodes.sort((a, b) => a.id - b.id);
+  
+  edgeMap = d3.map();
+  for (let i = 0; i < graphAll.edges.length; i++) {
+      if (ids.has(graphAll.edges[i].source) && ids.has(graphAll.edges[i].target)) {
+          graph.edges.push(graphAll.edges[i]);
+          edgeMap.set(graphAll.edges[i].source + "_" + graphAll.edges[i].target, graphAll.edges[i].publications.length);
+      }
+  }
+
+  drawLabels(svgMat, graph);
+  drawMatrix(svgMat, graph);
+  drawLegend(svgMat);
+
+  // drawSimulation must be in the last step
+  // because it changes graph.nodes[i].source and graph.nodes[i].target,
+  // which would affect other functions depend on these two properties
+  drawSimulation(svg, graph);
+});
+
+function drawLabels(svg, graph) {
+    var unitHeight = matrixHeight / graph.nodes.length;
+    var unitWidth = matrixWidth / graph.nodes.length;
+    var gap = 9;
+    
+    // draw axies.
+    for (let i = 0; i < graph.nodes.length; i++) {
+        var g1 = svg.append("g")
+            .attr("transform", "translate(" + (matOffsetX) + ", "+ (unitHeight * i + matOffsetY + gap) + ")");
+        g1.append("text")
+            .text(graph.nodes[i].fullname)
+            .attr("font-size", fontSize)
+            .attr("text-anchor", "end");
+            
+        var g2 = svg.append("g")
+            .attr("transform", "translate(" + (unitWidth * i + matOffsetX + gap) + ", " + (matOffsetY) + ") rotate(-90)");
+        g2.append("text")
+            .text(graph.nodes[i].fullname)
+            .attr("font-size", fontSize)
+            .attr("text-anchor", "start");
+    }
+}
+
+function drawMatrix(svg, graph) {
+    var w = matrixWidth / (graph.nodes.length + cellMarginRatio);
+    var h = matrixHeight / (graph.nodes.length + cellMarginRatio);
+    var marginW = w * cellMarginRatio;
+    var marginH = h * cellMarginRatio;
+    var cellW = w - marginW;
+    var cellH = h - marginH;
+        
+    var posY = marginH + matOffsetY;
+    for (let i = 0; i < graph.nodes.length; i++) {
+        let posX = matOffsetX + marginW;
+        for (let j = 0; j < graph.nodes.length; j++) {
+            drawCell(posX, posY, cellW, cellH, graph.nodes[i].id, graph.nodes[j].id);
+            posX += w;
+        }
+        posY += h;
+    }
+}
+
+function drawCell(x, y, width, height, id1, id2) {
+    var pubs = getPublications(id1, id2);
+    var rect = svgMat.append("rect")
+            .attr("x", x)
+            .attr("y", y)
+            .attr("width", width)
+            .attr("height", height)
+            .data([{"source":id1, "target":id2, "publications": pubs}]);
+
+    if (pubs == 0) {
+        rect.attr("fill", "lightgray");
+    } else {
+        rect.attr("fill", cellColorDark(pubs))
+        .on("mouseover", cellMouseovered)
+        .on("mouseout", cellMouseout);
+    }
+}
+
+function drawLegend(svg) {
+    var legend = d3.legendColor()
+                .scale(cellColorDark)
+                .labelFormat(d3.format("d"))
+                .labels(d3.legendHelpers.thresholdLabels)
+
+    svg.append("g")
+        .attr("transform", "translate(" + (matrixWidth + matOffsetX + 10) + ",150)")
+        .call(legend);
+}
+
+function drawSimulation(svg, graph) {
+    var link = svg.append("g")
+    .attr("class", "links")
+    .selectAll("line")
+    .data(graph.edges)
+    .enter().append("line")
+    .attr("stroke-width", function(d) {
+        return Math.sqrt(d.publications.length);
+    });
+
+    var node = svg.append("g")
+    .attr("class", "nodes")
+    .selectAll("circle")
+    .data(graph.nodes)
+    .enter().append("circle")
+      .attr("r", 5) // TODO: change size of circle
+      .attr("fill", function(d) { return color(d.id); })
+      .call(d3.drag()
+          .on("start", dragstarted)
+          .on("drag", dragged)
+          .on("end", dragended))
+          .on("mouseover", nodeMouseovered)
+          .on("mouseout", nodeMouseout);
+
+    node.append("title")
+      .text(function(d) { return d.fullname; });
+
+    simulation
+      .nodes(graph.nodes)
+      .on("tick", ticked);
+
+    simulation.force("link")
+      .links(graph.edges);
+
+  function ticked() {
+    link
+        .attr("x1", function(d) { return d.source.x; })
+        .attr("y1", function(d) { return d.source.y; })
+        .attr("x2", function(d) { return d.target.x; })
+        .attr("y2", function(d) { return d.target.y; });
+
+    node
+        .attr("cx", function(d) { return d.x; })
+        .attr("cy", function(d) { return d.y; });
+  }
+}
+
+function getPublications(id1, id2) {
+    let key;
+    if (id1 < id2) {
+        key = id1 + "_" + id2;
+    } else {
+        key = id2 + "_" + id1;
+    }
+
+    if (edgeMap.has(key)) {
+        return edgeMap.get(key);
+    } else {
+        return 0;
+    }
+}
+
+function dragstarted(d) {
+  if (!d3.event.active) simulation.alphaTarget(0.3).restart();
+  d.fx = d.x;
+  d.fy = d.y;
+}
+
+function dragged(d) {
+  d.fx = d3.event.x;
+  d.fy = d3.event.y;
+}
+
+function dragended(d) {
+  if (!d3.event.active) simulation.alphaTarget(0);
+  d.fx = null;
+  d.fy = null;
+}
+
+function nodeMouseovered(d) {
+    svgMat.selectAll("rect")
+        .filter((r) => r.publications == 0 && (r.source == d.id || r.target == d.id))
+        .attr("fill", (r) => {
+            if (r.publications) return cellColorDark(r.publications);
+            else return "gray";
+        });
+}
+
+function nodeMouseout(d) {
+        svgMat.selectAll("rect")
+        .filter((r) => r.publications == 0 && (r.source == d.id || r.target == d.id))
+        .attr("fill", (r) => {
+            if (r.publications) return cellColorLight(r.publications);
+            else return "lightgray";
+        });
+}
+
+function cellMouseovered(d) {
+    svg.selectAll("line")
+        .filter((r) => {
+            return (r.source.id == d.source && r.target.id == d.target) || (r.source.id == d.target && r.target.id == d.source);})
+        .style("stroke", "red");
+    
+    svg.selectAll("circle")
+        .filter((r) => (r.id != d.source) && (r.id != d.target))
+        .attr("fill", "#999");
+}
+
+function cellMouseout(d) {
+        svg.selectAll("line")
+            .filter((r) => (r.source.id == d.source && r.target.id == d.target) || (r.source.id == d.target && r.target.id == d.source))
+            .style("stroke", "#999");
+        
+        svg.selectAll("circle")
+            .filter((r) => (r.id != d.source) && (r.id != d.target))
+            .attr("fill", (r) => color(r.id));
+}
+
+</script> 
+</body>
+</html>

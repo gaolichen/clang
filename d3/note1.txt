@@ -1,0 +1,102 @@
+Outlines:
+a. HTML (CSS)
+b. Javascript
+c. d3.js
+d. Problems
+e. git
+
+
+1. HTML (Hyper Text Markup Language) 超文本标记语言
+learning resource: https://www.tutorialspoint.com/html/index.htm
+
+1.1 demo
+view source page
+inspect
+save files
+developer tools 
+
+1.2 basic concepts:
+HTML Tags (elements): <html> <head> <body> <p> <br>, <input>, <button>, <a>
+attributes: id, class, style
+events: onclick
+inner Text, inner html
+
+ex:
+<a href="http://tpcg.io/Oevfe8" target="_blank" rel="nofollow" class="demo">
+  <i class="fa-external-link">
+  </i>
+  Live Demo
+</a>
+
+empty element
+<br/>
+
+2. javascript
+2.1 demo
+2.2
+define variable: var, let
+define function:
+
+function sum(n) {
+	let ret = 0;
+	for (let i = 1; i <= n; i++) {
+		ret += i;
+	}
+
+	return ret;
+}
+
+anomalous function
+
+
+2.3
+alert()
+console.log()
+
+resource: https://developer.mozilla.org/en-US/docs/Web/javascript
+
+3. d3.js
+3.1. script tag:
+<script src = "https://d3js.org/d3.v4.min.js"></script>
+
+3.2 SVG (Scalable Vector Graphics)
+3.1 draw different shapes such as Lines, Rectangles, Circles, Ellipses
+
+demo: rect, translate
+
+4. problems
+4.1 open in browser:
+a) open command line
+b) cd to the problem folder
+c) run on command line "python -m http.server"
+open http://127.0.0.1:8000/
+
+4.1 level 1
+html
+load csv file: https://www.tutorialsteacher.com/d3js/loading-data-from-file-in-d3js
+Array.from(Array(12), () => new Array(lastYearOfData - firstYearOfData + 1));
+
+
+4.2 level 3
+
+Homework:
+1) The radii of nodes represent the total number of collaborators.
+	hint: you can add a property to the node data as "graph.nodes[0].collaborators = 2;"
+2) draw the arrow between two views.
+	hint: the arrow is a polygon filled with blue color. search "d3 draw polygon" for how to do it.
+3) show number of publications when mouse hover a cell.
+
+git:
+
+tutorial: https://git-scm.com/book/en/v2
+setup:
+$ git config --global user.name "John Doe"
+$ git config --global user.email johndoe@example.com
+
+git clone https://github.com/gaolichen/test1
+
+git status
+git add
+git commit
+git push
+git pull

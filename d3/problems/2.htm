@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+
+<html>
+   <head>
+       <title>Year/Month Heat map</title>
+      <script type = "text/javascript" src = "https://d3js.org/d3.v4.min.js"></script>
+      <script src = "https://d3js.org/d3-axis.v1.min.js"></script>
+      <script src = "https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+   </head>
+
+   <body>
+        <fieldset>
+	        <legend>Heat map control panel</legend>
+	        <div>
+                <input type="radio" id="highestTemperature"
+                 name="minMax" value="highest" checked onclick="updateView();">
+                <label for="highestTemperature">Highest</label>
+            
+                <input type="radio" id="lowestTemperature"
+                 name="minMax" value="lowest" onclick="updateView();">
+                <label for="highestTemperature">Lowest</label>
+            </div>
+        </fieldset>
+        <br/>
+        <fieldset>
+            <legend>Heat Map</legend>
+            <div id = "svgcontainer" align="center"></div>
+        </fieldset>
+
+       <script language = "javascript">
+            var mapWidth = 1000;
+            var mapHeight = 500;
+            
+            var offsetX = 60;
+            var offsetY = 20;
+            
+            var marginRatio = 0.1;
+
+            var legendWidth = 80;
+
+            var firstYearOfData = 2008;
+            var lastYearOfData = 2017;
+
+            var showMaxTemperature = true;
+
+            var minTemperatureMatrix;
+            var maxTemperatureMatrix;
+
+            var temperatureRange = [0, 40];
+            
+            var colorScale = d3.scaleLinear()
+                                .domain(temperatureRange)
+                                .range(["blue", "red"]);
+            
+            var svg;
+
+            //var csvPath = "https://raw.githubusercontent.com/HKUST-VISLab/coding-challenge/master/temperature_daily.csv";
+            var csvPath = "data/temperature_daily.csv";
+
+            d3.csv(csvPath, function (data) {
+               console.log(data.length);
+               console.log(data[0].date);
+               lastYearOfData = getYearMonth(data[data.length-1].date)[0];
+               console.log(firstYearOfData + ":" + lastYearOfData);
+               
+               minTemperatureMatrix = Array.from(Array(12), () => new Array(lastYearOfData - firstYearOfData + 1));
+               maxTemperatureMatrix = Array.from(Array(12), () => new Array(lastYearOfData - firstYearOfData + 1));
+               
+               for (let i = 0; i < 12; i++) {
+                   for (let j = 0; j < minTemperatureMatrix[i].length; j++) {
+                       minTemperatureMatrix[i][j] = [];
+                       maxTemperatureMatrix[i][j] = [];
+                   }
+               }
+               
+               for (let i = 0; i < data.length; i++) {
+                   let dy = getYearMonth(data[i].date);
+                   if (dy[0] < firstYearOfData) {
+                       continue;
+                   }
+                   
+                   minTemperatureMatrix[dy[1]][dy[0] - firstYearOfData].push(data[i].min_temperature);
+                   maxTemperatureMatrix[dy[1]][dy[0] - firstYearOfData].push(data[i].max_temperature);
+               }
+
+               updateView();
+            });
+
+            function updateView() {
+               var div = document.getElementById("svgcontainer");
+               removeAllChildNodes(div);
+               
+               initConfig();
+               
+               svg = d3.select("#svgcontainer")
+                .append("svg")
+                .attr("width", mapWidth + legendWidth)
+                .attr("height", mapHeight);
+                
+               if (showMaxTemperature) {
+                   drawMatrix(maxTemperatureMatrix);
+               } else {
+                   drawMatrix(minTemperatureMatrix);
+               }
+               drawAxis();
+               drawLegend();
+           }
+            
+            function initConfig() {
+                var maxRadioButton = document.getElementById("highestTemperature");
+                showMaxTemperature = maxRadioButton.checked;
+            }
+            
+            function drawMatrix(mat) {
+                var deltaX = lastYearOfData - firstYearOfData;
+                let h = (mapHeight - offsetY) / (mat.length + marginRatio);
+                let w = (mapWidth - offsetX) / (deltaX + 1 + marginRatio);
+                
+                let marginW = w * marginRatio;
+                let marginH = h * marginRatio;
+                
+                let cellWidth = w - marginW;
+                let cellHeight = h - marginH;
+                
+                // set the ranges
+                var x = d3.scaleLinear().range([0, cellWidth]);
+                var y = d3.scaleLinear()
+                        .domain(temperatureRange)
+                        .range([cellHeight, 0]);
+        
+                // define the line
+                var valueline = d3.line()
+                    .x(function(d, i) { return x(i); })
+                    .y(function(d) { return y(d); });
+                
+                let posY = offsetY + marginH;
+                for (let i = 0; i < mat.length; i++) {
+                    let posX = offsetX + marginW;
+                    for (let y = firstYearOfData; y <= lastYearOfData; y++) {
+                        drawTempCell(posX, posY, cellWidth, cellHeight, y + "-" + (i + 1), mat[i][y - firstYearOfData]);
+                                                x.domain([0, daysOfMonth(y, i + 1)]);
+
+                        let group = svg.append("g")
+                            .attr("transform", "translate(" + posX + ", " + posY + ")");
+                        
+                        // Add plot for min temperature.
+                        drawDailyChanges(group, valueline, minTemperatureMatrix[i][y - firstYearOfData], "green");
+
+                        // Add plot for max temperature.
+                        drawDailyChanges(group, valueline, maxTemperatureMatrix[i][y - firstYearOfData], "yellow");
+                        
+                        posX += w;
+                    }
+                    posY += h;
+                }
+            }
+
+            function drawTempCell(x, y, width, height, year, tempList) {
+                if (tempList.length == 0) {
+                    return;
+                }
+                
+                var rect = svg.append("rect")
+                    .attr("x", x)
+                    .attr("y", y)
+                    .attr("width", width)
+                    .attr("height", height)
+                    .attr("fill", colorScale(d3.mean(tempList)));
+                
+                rect.append("title").text("date: " + year + " max: " + d3.max(tempList) + " min: " + d3.min(tempList));
+            }
+
+            function drawDailyChanges(g, valueline, tempList, color) {
+                g.append("path")
+                    .attr("stroke", color)
+                    .attr("stroke-width", 1)
+                    .attr("fill", "none")
+                    .attr("d", valueline(tempList));
+            }
+                        
+            function drawAxis() {
+                var deltaX = lastYearOfData - firstYearOfData;
+                var xscale = d3.scaleLinear()
+                    .domain([-0.5 - marginRatio / 2, deltaX + 0.5 + marginRatio / 2])
+                    .range([0, mapWidth - offsetX]);
+                 
+                var yscale = d3.scaleLinear()
+                    .domain([-.5 - marginRatio / 2, 11.5 + marginRatio / 2])
+                    .range([0, mapHeight - offsetY]);
+            
+                 var x_axis = d3.axisTop().scale(xscale)
+                                .tickValues(d3.range(deltaX + 1))
+                                .tickFormat((d, i) => i + firstYearOfData);
+                 
+                 var months = [ "January", "February", "March", "April", "May", "June", 
+                            "July", "August", "September", "October", "November", "December" ];
+
+                 var y_axis = d3.axisLeft().scale(yscale)
+                                .tickValues(d3.range(12))
+                                .tickFormat((d, i) => months[i]);
+
+                svg.append("g")
+                    .attr("transform", "translate(" + offsetX + "," + offsetY + ")")
+                    .call(y_axis);
+                svg.append("g")
+                    .attr("transform", "translate(" + offsetX + "," + offsetY + ")")
+                    .call(x_axis)
+            }
+            
+            function drawLegend() {
+                var legend = d3.legendColor()
+                    .scale(colorScale)
+                    .cells(11)
+                    .shapePadding(0)
+                    .labelFormat(d3.format(".0f"));
+
+                svg.append("g")
+                    .attr("transform", "translate(" + (mapWidth + 10) + ",50)")
+                    .call(legend);
+            }
+            
+            function getYearMonth(datestr) {
+                let d = new Date(datestr);
+                return [d.getFullYear(), d.getMonth()];
+            }
+
+            function daysOfMonth(year, month) {
+                return new Date(year, month, 0).getDate();
+            };
+
+            function removeAllChildNodes(parent) {
+                while (parent.firstChild) {
+                    parent.removeChild(parent.firstChild);
+                }
+            }           
+       </script>
+   </body>
+</html>
