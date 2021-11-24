@@ -1,12 +1,12 @@
 #pragma once
 #include <iostream>
-#define USE_STD_STRING
-#define USE_STD_VECTOR
+//#define USE_STD_STRING
+//#define USE_STD_VECTOR
 
 #ifdef USE_STD_STRING
 #include <string>
 using String = std::string;
-#else:
+#else
 #include "simplestring.h"
 using String = SimpleString;
 #endif

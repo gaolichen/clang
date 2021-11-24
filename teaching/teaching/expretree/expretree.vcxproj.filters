@@ -35,5 +35,11 @@
     <ClInclude Include="types.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="simplestring.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="simplevector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

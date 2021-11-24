@@ -146,6 +146,8 @@
     <ClInclude Include="expreparser.h" />
     <ClInclude Include="expretree.h" />
     <ClInclude Include="polynomial.h" />
+    <ClInclude Include="simplestring.h" />
+    <ClInclude Include="simplevector.h" />
     <ClInclude Include="types.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
