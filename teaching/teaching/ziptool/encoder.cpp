@@ -1,6 +1,6 @@
 #include "encoder.h"
 
-void HuffmanEncoder::_addToBuffer(unsigned int encoding) {
+void HuffmanEncoder::_addToBuffer(EncodingType encoding) {
 	if (_pos >= BUFFER_SIZE - 5) {
 		flush();
 	}

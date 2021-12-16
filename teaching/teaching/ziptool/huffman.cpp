@@ -34,7 +34,7 @@ HuffmanNode* HuffmanNode::buildFromWeights(const Vector<int>& wordWeights) {
 
 
 
-void HuffmanNode::_wordToEncoding(const HuffmanNode* node, Vector<unsigned int>& res, int depth, int currEncoding) {
+void HuffmanNode::_wordToEncoding(const HuffmanNode* node, Vector<EncodingType>& res, int depth, EncodingType currEncoding) {
 	if (node == nullptr) {
 		return;
 	}
@@ -52,7 +52,7 @@ void HuffmanNode::_wordToEncoding(const HuffmanNode* node, Vector<unsigned int>&
 	}
 	else {
 		_wordToEncoding(node->leftChild(), res, depth + 1, currEncoding);
-		_wordToEncoding(node->rightChild(), res, depth + 1, currEncoding | (0x1 << depth));
+		_wordToEncoding(node->rightChild(), res, depth + 1, currEncoding | ((EncodingType)0x1LL << depth));
 	}
 }
 
@@ -67,7 +67,7 @@ void printBinary(char ch) {
 	}
 }
 
-void printEncoding(unsigned int encoding) {
+void printEncoding(EncodingType encoding) {
 	int n = BITS_NUM(encoding);
 	int bits = ENCODING_TO_BITS(encoding);
 	for (int i = 0; i < n; i++) {

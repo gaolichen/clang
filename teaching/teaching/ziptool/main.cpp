@@ -140,7 +140,7 @@ void testDecoder() {
     Vector<int> wordCounts = reader.wordCounts();
     HuffmanEncoder encoder(wordCounts, &writer);
     HuffmanNode* node = HuffmanNode::buildFromWeights(wordCounts);
-    Vector<unsigned int> wordToEncoding = node->wordToEncoding();
+    Vector<EncodingType> wordToEncoding = node->wordToEncoding();
 
     String content = "hello world.";
     String s = content + "*sa4";
@@ -255,6 +255,15 @@ void integratedTest() {
 
 #pragma endregion
 
+void fibo(int n) {
+    EncodingType a = 0, b = 1;
+    for (int i = 0; i < n; i++) {
+        EncodingType c = a;
+        a = b;
+        b += c;
+        std::cout << i + 1 << ' ' << a << std::endl;
+    }
+}
 
 void showHelp() {
     std::cout << "szip zip|unzip source [dest]" << std::endl;

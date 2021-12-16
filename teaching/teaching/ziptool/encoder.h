@@ -45,17 +45,17 @@ class HuffmanEncoder {
 private:
 	HuffmanNode* _tree = nullptr;
 	Vector<int> _wordCounts;
-	Vector<unsigned int> _word2Encoding;
+	Vector<EncodingType> _word2Encoding;
 	char* _buf;
 	int _pos = 0;
 	int _nbit = 0;
 	EncoderWriter* _writer;
 
-	int _stop;
-	int _splitor;
+	EncodingType _stop;
+	EncodingType _splitor;
 
 	void _initHeader();
-	void _addToBuffer(unsigned int encoding);
+	void _addToBuffer(EncodingType encoding);
 public:
 	HuffmanEncoder(const Vector<int>& wordWeights, EncoderWriter* writer) : _wordCounts(wordWeights), _writer(writer) {
 		_tree = HuffmanNode::buildFromWeights(wordWeights);

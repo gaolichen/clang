@@ -3,9 +3,17 @@
 #include <cstdlib>
 #include <queue>
 
-#define ENCODING_TO_BITS(x) ((x) & 0x7ffffff)
-#define BITS_NUM(x) ((x)>>27)
-#define TO_ENCODING(depth, bits) (((depth) << 27) | (bits))
+
+typedef unsigned long long EncodingType;
+
+//#define ENCODING_TO_BITS(x) ((x) & 0x7ffffff)
+//#define BITS_NUM(x) ((x)>>27)
+//#define TO_ENCODING(depth, bits) (((depth) << 27) | (bits))
+
+#define ENCODING_TO_BITS(x) ((x) & 0x3ffffffffffffffLL)
+#define BITS_NUM(x) ((x)>>58)
+#define TO_ENCODING(depth, bits) ((((EncodingType)(depth)) << 58) | (bits))
+
 
 typedef int WordType;
 enum SpecialNodeType : int { EofNode = 1, StopNode = 2 };
@@ -17,7 +25,7 @@ protected:
 	HuffmanNode* _left = nullptr;
 	HuffmanNode* _right = nullptr;
 
-	static void _wordToEncoding(const HuffmanNode* node, Vector<unsigned int>& res, int depth, int encoding);
+	static void _wordToEncoding(const HuffmanNode* node, Vector<EncodingType>& res, int depth, EncodingType encoding);
 public:
 	HuffmanNode(WordType word, int weight) : _word(word), _weight(weight) {
 	}
@@ -68,8 +76,8 @@ public:
 		return _right;
 	}
 
-	Vector<unsigned int> wordToEncoding() const {
-		Vector<unsigned int> res(256 + 2, 0);
+	Vector<EncodingType> wordToEncoding() const {
+		Vector<EncodingType> res(256 + 2, 0);
 		_wordToEncoding(this, res, 0, 0);
 		return res;
 	}
@@ -78,4 +86,4 @@ public:
 };
 
 void printBinary(char ch);
-void printEncoding(unsigned int encoding);
+void printEncoding(EncodingType encoding);

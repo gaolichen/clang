@@ -30,6 +30,8 @@ public:
 	virtual void write(char* bytes, int size) {
 		if (!_writingFile) {
 			_structure.insert(_structure.end(), bytes, bytes + size);
+			//String s(_structure.begin(), _structure.end());
+			//std::cout << "_structure = " << s << std::endl;
 		}
 		else {
 			_out.write(bytes, size);
@@ -52,6 +54,7 @@ private:
 	int _pos = 0;
 
 	void _addToBuffer(char ch) {
+		//std::cout << ch << std::endl;
 		if (_pos >= BUFFER_SIZE - 5) {
 			flush();
 		}
