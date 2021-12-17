@@ -141,6 +141,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="compress.cpp" />
     <ClCompile Include="decoder.cpp" />
     <ClCompile Include="encoder.cpp" />
     <ClCompile Include="huffman.cpp" />

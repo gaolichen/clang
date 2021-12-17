@@ -3,6 +3,70 @@
 #include "encoder.h"
 #include "decoder.h"
 
+class DefaultEncoderWriter : public EncoderWriter {
+    String _path;
+    std::ofstream _out;
+public:
+    DefaultEncoderWriter(const String& path) : _path(path) {
+        _out.open(path, std::ofstream::out | std::ofstream::binary);
+    }
+
+    ~DefaultEncoderWriter() {
+        close();
+    }
+
+    virtual void write(const char* bytes, int size) {
+        _out.write(bytes, size);
+    }
+
+    virtual void write(int x) {
+        _out.write((char*)(&x), 4);
+    }
+
+    virtual void close() {
+        if (_out.is_open()) {
+            _out.close();
+        }
+    }
+};
+
+class DefaultDecodeWriter : public DecodeWriter {
+    String _path;
+    Vector<char> _structure;
+    bool _writingFile = false;
+    Vector<String> _files;
+    int _fileIndex = -1;
+    std::ofstream _out;
+
+public:
+    DefaultDecodeWriter(const String& path) : _path(path) {
+    }
+
+    ~DefaultDecodeWriter() {
+        close();
+    }
+
+    virtual bool next();
+
+    virtual void write(char* bytes, int size) {
+        if (!_writingFile) {
+            _structure.insert(_structure.end(), bytes, bytes + size);
+            //String s(_structure.begin(), _structure.end());
+            //std::cout << "_structure = " << s << std::endl;
+        }
+        else {
+            _out.write(bytes, size);
+        }
+    }
+
+    void close() {
+        if (_out.is_open()) {
+            _out.close();
+        }
+    }
+};
+
+
 class Compresser {
 public:
 	void compress(const String& sourcePath, const String& destPath) {

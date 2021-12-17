@@ -14,33 +14,6 @@ public:
 	virtual void close() = 0;
 };
 
-class DefaultEncoderWriter : public EncoderWriter {
-	String _path;
-	std::ofstream _out;
-public:
-	DefaultEncoderWriter(const String& path) : _path(path) {
-		_out.open(path, std::ofstream::out | std::ofstream::binary);
-	}
-
-	~DefaultEncoderWriter() {
-		close();
-	}
-
-	virtual void write(const char* bytes, int size) {
-		_out.write(bytes, size);
-	}
-
-	virtual void write(int x) {
-		_out.write((char*)(&x), 4);
-	}
-
-	virtual void close() {
-		if (_out.is_open()) {
-			_out.close();
-		}
-	}
-};
-
 class HuffmanEncoder {
 private:
 	HuffmanNode* _tree = nullptr;

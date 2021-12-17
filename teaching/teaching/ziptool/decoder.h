@@ -9,42 +9,6 @@ public:
 	virtual void close() = 0;
 };
 
-class DefaultDecodeWriter : public DecodeWriter {
-	String _path;
-	Vector<char> _structure;
-	bool _writingFile = false;
-	Vector<String> _files;
-	int _fileIndex = -1;
-	std::ofstream _out;
-
-public:
-	DefaultDecodeWriter(const String& path) : _path(path) {
-	}
-
-	~DefaultDecodeWriter() {
-		close();
-	}
-
-	virtual bool next();
-
-	virtual void write(char* bytes, int size) {
-		if (!_writingFile) {
-			_structure.insert(_structure.end(), bytes, bytes + size);
-			//String s(_structure.begin(), _structure.end());
-			//std::cout << "_structure = " << s << std::endl;
-		}
-		else {
-			_out.write(bytes, size);
-		}
-	}
-
-	void close() {
-		if (_out.is_open()) {
-			_out.close();
-		}
-	}
-};
-
 class HuffmanDecoder {
 private:
 	HuffmanNode* _tree = nullptr;
